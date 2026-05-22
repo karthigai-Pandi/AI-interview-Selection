@@ -49,14 +49,14 @@ const AdminDashboard = () => {
                 <p className="font-semibold text-white">Nina Patel</p>
                 <span className="rounded-full bg-sky-500/10 px-3 py-1 text-xs uppercase tracking-[0.2em] text-sky-300">Interview</span>
               </div>
-              <p className="mt-2 text-slate-400">Scheduled for March 22 at 10 AM.</p>
+              <p className="mt-2 text-slate-300">Scheduled for March 22 at 10 AM.</p>
             </li>
             <li className="rounded-3xl border border-white/10 bg-slate-950/70 p-4">
               <div className="flex items-center justify-between gap-2">
                 <p className="font-semibold text-white">Gabe Rivera</p>
                 <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs uppercase tracking-[0.2em] text-emerald-300">Recommended</span>
               </div>
-              <p className="mt-2 text-slate-400">AI match score 94% for product role.</p>
+              <p className="mt-2 text-slate-300">AI match score 94% for product role.</p>
             </li>
           </ul>
         </Card>

@@ -88,8 +88,8 @@ const TechnicalTestPage = () => {
     setQuestions(selected);
   }, [workflow.aptitude.completed, workflow.technical.total]);
 
-  if (!workflow.aptitude.completed) {
-    return <Navigate replace to="/candidate/aptitude" />;
+  if (workflow.currentStep !== 'technical') {
+    return <Navigate replace to={`/candidate/${workflow.currentStep}`} />;
   }
 
   const currentQuestion = questions[currentIndex];
@@ -127,7 +127,7 @@ const TechnicalTestPage = () => {
                     className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
                       workflow.technical.difficulty === level
                         ? 'bg-indigo-500 text-white'
-                        : 'bg-slate-900/80 text-slate-300 hover:bg-slate-800'
+                        : 'bg-surface/80 text-slate-300 hover:bg-surface/70'
                     }`}
                   >
                     {level}
@@ -135,14 +135,14 @@ const TechnicalTestPage = () => {
                 ))}
               </div>
             </div>
-            <div className="rounded-3xl bg-slate-900/80 p-4 text-sm text-slate-300">
+            <div className="rounded-3xl bg-surface/80 p-4 text-sm text-slate-300">
               {submitted ? 'Assessment submitted' : `${questions.length} questions ready`}
             </div>
           </div>
 
           {currentQuestion && (
-            <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-6">
-              <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Category: {currentQuestion.category}</p>
+            <div className="rounded-3xl border border-white/10 bg-surface/80 p-6">
+              <p className="text-sm uppercase tracking-[0.24em] text-slate-300">Category: {currentQuestion.category}</p>
               <h3 className="mt-4 text-xl font-semibold text-white">{currentQuestion.prompt}</h3>
               <div className="mt-6 grid gap-3">
                 {currentQuestion.options.map((option) => (

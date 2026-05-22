@@ -25,16 +25,16 @@ const PerformanceAnalysisPage = () => {
     <div className="space-y-6">
       <Card title="Performance analysis" description="Final candidate scoring, ranking, and AI feedback after all rounds.">
         <div className="grid gap-5 lg:grid-cols-3">
-          <div className="rounded-3xl bg-slate-950/70 p-6 border border-white/10">
-            <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Overall score</p>
+          <div className="rounded-3xl bg-surface/80 p-6 border border-white/10">
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-300">Overall score</p>
             <p className="mt-4 text-5xl font-semibold text-white">{totalScore}%</p>
           </div>
-          <div className="rounded-3xl bg-slate-950/70 p-6 border border-white/10">
-            <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Candidate ranking</p>
+          <div className="rounded-3xl bg-surface/80 p-6 border border-white/10">
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-300">Candidate ranking</p>
             <p className="mt-4 text-5xl font-semibold text-white">Top 12%</p>
           </div>
-          <div className="rounded-3xl bg-slate-950/70 p-6 border border-white/10">
-            <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Confidence analysis</p>
+          <div className="rounded-3xl bg-surface/80 p-6 border border-white/10">
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-300">Confidence analysis</p>
             <p className="mt-4 text-5xl font-semibold text-white">{workflow.interview.confidenceScore}%</p>
           </div>
         </div>
@@ -44,12 +44,12 @@ const PerformanceAnalysisPage = () => {
         <Card title="Score breakdown" description="Individual stage component performance.">
           <div className="grid gap-4">
             {data.map((item) => (
-              <div key={item.name} className="rounded-3xl border border-white/10 bg-slate-950/70 p-5">
+              <div key={item.name} className="rounded-3xl border border-white/10 bg-surface/80 p-5">
                 <div className="flex items-center justify-between gap-4">
-                  <span className="text-sm uppercase tracking-[0.18em] text-slate-400">{item.name}</span>
+                  <span className="text-sm uppercase tracking-[0.18em] text-slate-300">{item.name}</span>
                   <span className="text-xl font-semibold text-white">{item.score}%</span>
                 </div>
-                <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-800">
+                <div className="mt-3 h-3 overflow-hidden rounded-full bg-surface/80">
                   <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400" style={{ width: `${item.score}%` }} />
                 </div>
               </div>

@@ -12,13 +12,10 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { token, user } = useSelector((state: RootState) => state.auth);
+  const workflow = useSelector((state: RootState) => state.workflow);
   const [email, setEmail] = useState(import.meta.env.DEV ? 'candidate@example.com' : '');
   const [password, setPassword] = useState(import.meta.env.DEV ? 'password123' : '');
   const [error, setError] = useState('');
-
-  if (token && user) {
-    return <Navigate replace to={user.role === 'admin' ? '/admin' : '/candidate'} />;
-  }
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -29,7 +26,6 @@ const LoginPage = () => {
       const response = await loginRequest({ email, password });
       const { user, token } = response.data;
       dispatch(loginSuccess({ user, token }));
-      navigate(user.role === 'admin' ? '/admin' : '/candidate/resume');
     } catch (err: any) {
       setError(err?.response?.data?.message || err?.message || 'Login failed. Please try again.');
     }
@@ -41,6 +37,13 @@ const LoginPage = () => {
     window.addEventListener('ais:auth:unauthorized', onUnauthorized as EventListener);
     return () => window.removeEventListener('ais:auth:unauthorized', onUnauthorized as EventListener);
   }, []);
+
+  if (token && user) {
+    if (user.role === 'admin') {
+      return <Navigate replace to="/admin" />;
+    }
+    return <Navigate replace to={`/candidate/${workflow.currentStep}`} />;
+  }
 
   return (
     <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }} className="mx-auto max-w-xl">

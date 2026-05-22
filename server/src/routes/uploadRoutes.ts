@@ -5,7 +5,7 @@ import { resumeUpload } from '../utils/upload';
 
 const router = Router();
 
-router.use(protect);
+// Allow public resume uploads for initial onboarding (no auth required)
 router.post('/resume', resumeUpload.single('resume'), uploadResume);
 
 export default router;

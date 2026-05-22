@@ -111,8 +111,8 @@ const AptitudeTestPage = () => {
     return () => window.clearTimeout(timer);
   }, [timeLeft, submitted]);
 
-  if (!workflow.resume.completed) {
-    return <Navigate replace to="/candidate/resume" />;
+  if (workflow.currentStep !== 'aptitude') {
+    return <Navigate replace to={`/candidate/${workflow.currentStep}`} />;
   }
 
   const currentQuestion = questions[currentIndex];
@@ -142,13 +142,13 @@ const AptitudeTestPage = () => {
     <div className="grid gap-6 xl:grid-cols-[0.9fr_0.7fr]">
       <Card title="Aptitude test" description="Complete the timed MCQ section to unlock the next technical round.">
         <div className="space-y-8">
-          <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-6">
+          <div className="rounded-3xl border border-white/10 bg-surface/80 p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Question {currentIndex + 1} of {questions.length}</p>
+                <p className="text-sm uppercase tracking-[0.24em] text-slate-300">Question {currentIndex + 1} of {questions.length}</p>
                 <h3 className="mt-3 text-xl font-semibold text-white">{currentQuestion?.prompt}</h3>
               </div>
-              <div className="rounded-full bg-slate-900/80 px-5 py-3 text-sm font-semibold text-slate-100">
+              <div className="rounded-full bg-surface/80 px-5 py-3 text-sm font-semibold text-slate-100">
                 {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
               </div>
             </div>
@@ -161,7 +161,7 @@ const AptitudeTestPage = () => {
                   className={`w-full rounded-3xl border px-5 py-4 text-left transition ${
                     answers[currentQuestion.id] === option
                       ? 'border-indigo-400 bg-indigo-500/10 text-white'
-                      : 'border-white/10 bg-slate-900/80 text-slate-300 hover:border-white/20 hover:bg-slate-800'
+                      : 'border-white/10 bg-surface/80 text-slate-300 hover:border-white/20 hover:bg-surface/70'
                   }`}
                 >
                   {option}
@@ -171,7 +171,7 @@ const AptitudeTestPage = () => {
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex gap-3 text-sm text-slate-400">
+            <div className="flex gap-3 text-sm text-slate-300">
               <span>Attempted: {attempted}</span>
               <span>Unattempted: {unattempted}</span>
               <span>Progress: {progress}%</span>
@@ -195,22 +195,22 @@ const AptitudeTestPage = () => {
 
       <Card title="Aptitude summary" description="Real-time progress and topic breakdown.">
         <div className="space-y-5">
-          <div className="rounded-3xl bg-slate-900/80 p-5 border border-white/10">
-            <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Timer</p>
+          <div className="rounded-3xl bg-surface/80 p-5 border border-white/10">
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-300">Timer</p>
             <p className="mt-3 text-3xl font-semibold text-white">{Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</p>
           </div>
-          <div className="rounded-3xl bg-slate-900/80 p-5 border border-white/10">
-            <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Topics</p>
+          <div className="rounded-3xl bg-surface/80 p-5 border border-white/10">
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-300">Topics</p>
             <div className="mt-3 grid gap-3">
               {['Quantitative aptitude', 'Logical reasoning', 'Verbal ability'].map((topic) => (
-                <div key={topic} className="rounded-3xl bg-slate-950/80 p-4 border border-white/10">
+                <div key={topic} className="rounded-3xl bg-surface/80 p-4 border border-white/10">
                   <p className="text-sm text-slate-300">{topic}</p>
                 </div>
               ))}
             </div>
           </div>
-          <div className="rounded-3xl bg-slate-900/80 p-5 border border-white/10">
-            <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Attempted status</p>
+          <div className="rounded-3xl bg-surface/80 p-5 border border-white/10">
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-300">Attempted status</p>
             <div className="mt-4 grid gap-2">
               <div className="flex items-center justify-between text-sm text-slate-300"><span>Answered</span><span>{attempted}</span></div>
               <div className="flex items-center justify-between text-sm text-slate-300"><span>Remaining</span><span>{unattempted}</span></div>

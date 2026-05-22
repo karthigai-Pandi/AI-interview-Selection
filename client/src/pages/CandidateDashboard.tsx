@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { motion } from 'framer-motion';
@@ -8,6 +9,8 @@ import Button from '../components/ui/Button';
 import DashboardShell from '../components/layout/DashboardShell';
 import { uploadResumeFile } from '../services/uploadService';
 import { analyzeResumeText } from '../services/aiService';
+import { RootState } from '../store';
+import { resetWorkflow } from '../store/slices/workflowSlice';
 
 const performanceData = [
   { week: 'W1', score: 64 },
@@ -17,7 +20,9 @@ const performanceData = [
 ];
 
 const CandidateDashboard = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const workflow = useSelector((state: RootState) => state.workflow);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [hasResume, setHasResume] = useState(false);
@@ -66,11 +71,20 @@ const CandidateDashboard = () => {
   };
 
   const handleStartInterview = () => {
+    if (workflow.currentStep !== 'interview') {
+      navigate(`/candidate/${workflow.currentStep}`);
+      return;
+    }
+
     setIsInterviewing(true);
     // Add small delay for button animation then navigate to actual interview page
     setTimeout(() => {
       navigate('/candidate/interview');
     }, 500);
+  };
+
+  const handleResetWorkflow = () => {
+    dispatch(resetWorkflow());
   };
 
   return (
@@ -116,7 +130,11 @@ const CandidateDashboard = () => {
                 onClick={handleStartInterview}
                 disabled={isInterviewing}
               >
-                {hasInterviews ? 'Continue practice' : 'Start real mock interview'}
+                {workflow.currentStep === 'interview'
+                  ? hasInterviews
+                    ? 'Continue practice'
+                    : 'Start real mock interview'
+                  : 'Continue workflow'}
               </Button>
               
               <input 
@@ -137,6 +155,11 @@ const CandidateDashboard = () => {
               </Button>
               
               <Button variant="ghost" className="w-full justify-start">Explore employer matches</Button>
+              {import.meta.env.DEV && (
+                <Button variant="ghost" className="w-full justify-start text-rose-300 hover:text-white" onClick={handleResetWorkflow}>
+                  Reset workflow (dev)
+                </Button>
+              )}
             </div>
           </Card>
         </div>

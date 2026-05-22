@@ -56,8 +56,8 @@ const ResumeUploadPage = () => {
     }
   };
 
-  if (workflow.currentStep !== 'resume' && workflow.resume.completed) {
-    return <Navigate replace to="/candidate/aptitude" />;
+  if (workflow.currentStep !== 'resume') {
+    return <Navigate replace to={`/candidate/${workflow.currentStep}`} />;
   }
 
   return (
@@ -66,17 +66,17 @@ const ResumeUploadPage = () => {
         <div className="space-y-6">
           <div className="rounded-3xl border border-white/10 bg-slate-950/60 p-6">
             <label className="block text-sm text-slate-300">Select resume file</label>
-            <input
+                <input
               type="file"
               accept=".pdf,.doc,.docx"
               onChange={handleFileChange}
-              className="mt-4 w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none"
+                  className="mt-4 w-full rounded-3xl border border-white/10 bg-surface/80 px-4 py-3 text-slate-100 outline-none"
             />
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-6">
             <p className="text-sm text-slate-400">Upload progress</p>
-            <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-800">
+              <div className="mt-4 h-3 overflow-hidden rounded-full bg-surface/80">
               <motion.div
                 initial={false}
                 animate={{ width: `${workflow.resume.uploadProgress}%` }}

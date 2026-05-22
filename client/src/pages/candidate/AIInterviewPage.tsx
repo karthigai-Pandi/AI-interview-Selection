@@ -26,15 +26,29 @@ const AIInterviewPage = () => {
   const [recorder, setRecorder] = useState<MediaRecorder | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [timeLeft, setTimeLeft] = useState(INTERVIEW_TIME_SECONDS);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [questionsError, setQuestionsError] = useState('');
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
-    if (!workflow.coding.completed) return;
+    if (workflow.currentStep !== 'interview' || workflow.interview.completed || workflow.interview.questions.length > 0) {
+      return;
+    }
 
-    getInterviewQuestions().then((questions) => {
-      dispatch(setInterviewQuestions(questions));
-    });
-  }, [dispatch, workflow.coding.completed]);
+    setLoadingQuestions(true);
+    setQuestionsError('');
+
+    getInterviewQuestions()
+      .then((questions) => {
+        dispatch(setInterviewQuestions(questions));
+      })
+      .catch(() => {
+        setQuestionsError('Unable to load interview prompts. Refresh the page or try again later.');
+      })
+      .finally(() => {
+        setLoadingQuestions(false);
+      });
+  }, [dispatch, workflow.currentStep, workflow.interview.completed, workflow.interview.questions.length]);
 
   useEffect(() => {
     setTimeLeft(INTERVIEW_TIME_SECONDS);
@@ -63,8 +77,8 @@ const AIInterviewPage = () => {
     }
   }, [stream]);
 
-  if (!workflow.coding.completed) {
-    return <Navigate replace to="/candidate/coding" />;
+  if (workflow.currentStep !== 'interview') {
+    return <Navigate replace to={`/candidate/${workflow.currentStep}`} />;
   }
 
   if (workflow.interview.completed) {
@@ -176,7 +190,7 @@ const AIInterviewPage = () => {
     <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
       <Card title="AI interview" description="Multi-step candidate interview with immersive question, answer, and review stages.">
         <div className="space-y-6">
-          <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-6">
+          <div className="rounded-3xl border border-white/10 bg-surface/80 p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Question {workflow.interview.currentQuestion + 1} / {total}</p>
@@ -192,7 +206,7 @@ const AIInterviewPage = () => {
               <div className="h-3 overflow-hidden rounded-full bg-slate-900">
                 <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500" style={{ width: `${Math.min(100, Math.max(12, progressValue))}%` }} />
               </div>
-              <p className="text-sm text-slate-400">Progress through the interview flow.</p>
+                <p className="text-sm text-slate-300">Progress through the interview flow.</p>
             </div>
           </div>
 
@@ -201,14 +215,16 @@ const AIInterviewPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="rounded-3xl border border-white/10 bg-slate-950/70 p-6"
+            className="rounded-3xl border border-white/10 bg-surface/80 p-6"
           >
             {stage === 'prompt' && (
               <div className="space-y-5">
-                <div className="rounded-3xl bg-slate-900/80 p-6 border border-white/10">
-                  <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Interview prompt</p>
+                <div className="rounded-3xl bg-surface/80 p-6 border border-white/10">
+                  <p className="text-sm uppercase tracking-[0.24em] text-slate-300">Interview prompt</p>
                   <p className="mt-4 text-lg text-slate-200 leading-relaxed">Read the question carefully and plan your answer. When you feel ready, move into the answer stage.</p>
                 </div>
+                {loadingQuestions && <p className="text-sm text-slate-300">Loading interview prompts...</p>}
+                {questionsError && <p className="text-sm text-red-400">{questionsError}</p>}
                 <div className="space-y-4">
                   <div className="rounded-3xl border border-white/10 bg-slate-900/80 p-5">
                     <p className="text-sm uppercase tracking-[0.24em] text-slate-400">What to do next</p>
@@ -218,8 +234,8 @@ const AIInterviewPage = () => {
                       <li>Use the video preview to maintain strong delivery.</li>
                     </ul>
                   </div>
-                  <Button onClick={handleBeginAnswer} disabled={!cameraActive}>Start answering</Button>
-                  {!cameraActive && <p className="text-sm text-slate-400">Webcam is required to begin the answer stage.</p>}
+                  <Button onClick={handleBeginAnswer} disabled={!cameraActive || loadingQuestions}>Start answering</Button>
+                  {!cameraActive && <p className="text-sm text-slate-300">Webcam is required to begin the answer stage.</p>}
                 </div>
               </div>
             )}
@@ -253,14 +269,14 @@ const AIInterviewPage = () => {
                 </div>
 
                 {cameraActive && (
-                  <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-4">
-                    <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Live preview</p>
+                  <div className="rounded-3xl border border-white/10 bg-surface/80 p-4">
+                    <p className="text-sm uppercase tracking-[0.24em] text-slate-300">Live preview</p>
                     <video
                       ref={videoRef}
                       autoPlay
                       muted
                       playsInline
-                      className="mt-4 h-64 w-full rounded-3xl border border-white/10 bg-slate-900 object-cover"
+                      className="mt-4 h-64 w-full rounded-3xl border border-white/10 bg-surface/80 object-cover"
                     />
                   </div>
                 )}
@@ -311,14 +327,14 @@ const AIInterviewPage = () => {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-slate-900/80 p-5">
-            <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Desktop interview monitor</p>
-            <div className="mt-4 rounded-3xl bg-slate-950/90 p-4">
+          <div className="rounded-3xl border border-white/10 bg-surface/80 p-5">
+            <p className="text-sm uppercase tracking-[0.24em] text-slate-300">Desktop interview monitor</p>
+            <div className="mt-4 rounded-3xl bg-surface/90 p-4">
               <div className="mb-4 flex items-center justify-between text-slate-300">
                 <span className="text-sm">Live candidate view</span>
                 <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">Recording</span>
               </div>
-              <div className="h-48 rounded-3xl bg-slate-800" />
+              <div className="h-48 rounded-3xl bg-surface/80" />
             </div>
           </div>
 
