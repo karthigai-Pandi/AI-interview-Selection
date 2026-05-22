@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../components/ui/Button';
@@ -12,8 +12,8 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { token, user } = useSelector((state: RootState) => state.auth);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(import.meta.env.DEV ? 'candidate@example.com' : '');
+  const [password, setPassword] = useState(import.meta.env.DEV ? 'password123' : '');
   const [error, setError] = useState('');
 
   if (token && user) {
@@ -34,6 +34,13 @@ const LoginPage = () => {
       setError(err?.response?.data?.message || err?.message || 'Login failed. Please try again.');
     }
   };
+
+  // listen for global unauthorized event (clears token on 401)
+  useEffect(() => {
+    const onUnauthorized = () => setError('Session expired. Please sign in again.');
+    window.addEventListener('ais:auth:unauthorized', onUnauthorized as EventListener);
+    return () => window.removeEventListener('ais:auth:unauthorized', onUnauthorized as EventListener);
+  }, []);
 
   return (
     <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }} className="mx-auto max-w-xl">

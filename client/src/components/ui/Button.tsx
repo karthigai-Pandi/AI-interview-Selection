@@ -8,9 +8,9 @@ interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children' | 'onDr
 }
 
 const variants = {
-  primary: 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:from-indigo-400 hover:to-purple-400',
-  secondary: 'bg-slate-800/80 backdrop-blur-md text-slate-100 border border-white/10 hover:bg-slate-700/80 hover:border-white/20',
-  ghost: 'bg-transparent text-slate-300 hover:bg-white/5 hover:text-white',
+  primary: 'bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-600 hover:shadow-primary/30',
+  secondary: 'bg-surface/80 backdrop-blur-md text-white border border-primary/8 hover:bg-surface/90 hover:border-primary/12',
+  ghost: 'bg-transparent text-accent hover:bg-white/3 hover:text-white',
 };
 
 const Button = ({ variant = 'primary', icon, children, ...props }: ButtonProps) => {

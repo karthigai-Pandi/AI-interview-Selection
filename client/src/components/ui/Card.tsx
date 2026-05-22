@@ -9,11 +9,11 @@ interface CardProps {
 
 const Card = ({ title, description, children, className = '' }: CardProps) => {
   return (
-    <section className={`rounded-3xl border border-white/10 bg-slate-900/70 p-6 shadow-glass backdrop-blur-xl ${className}`}>
+    <section className={`rounded-3xl border border-white/6 bg-surface/80 p-6 shadow-soft-lg ${className}`}>
       {(title || description) && (
         <div className="mb-5">
-          {title && <h3 className="text-xl font-semibold text-slate-100">{title}</h3>}
-          {description && <p className="mt-2 text-sm text-slate-400">{description}</p>}
+          {title && <h3 className="text-xl font-semibold text-white">{title}</h3>}
+          {description && <p className="mt-2 text-sm text-slate-300">{description}</p>}
         </div>
       )}
       {children}
