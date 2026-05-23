@@ -74,6 +74,11 @@ const AIInterviewPage = () => {
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.srcObject = stream;
+      if (stream) {
+        videoRef.current.play().catch(() => {
+          // Ignore autoplay issues; the video preview will still show once allowed.
+        });
+      }
     }
   }, [stream]);
 
@@ -95,17 +100,17 @@ const AIInterviewPage = () => {
 
   const handleStartCamera = async () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setMediaError('Webcam and microphone are not supported in this browser.');
+      setMediaError('Webcam is not supported in this browser.');
       return;
     }
 
     try {
-      const userStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: { width: 640, height: 480 } });
+      const userStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
       setStream(userStream);
       setCameraActive(true);
       setMediaError('');
     } catch {
-      setMediaError('Microphone or camera access was denied.');
+      setMediaError('Camera access was denied or is unavailable.');
     }
   };
 
@@ -127,14 +132,24 @@ const AIInterviewPage = () => {
     }
   };
 
-  const handleStartRecording = () => {
+  const handleStartRecording = async () => {
     if (!stream) {
       setMediaError('Start the camera first to enable recording.');
       return;
     }
 
     try {
-      const mediaRecorder = new MediaRecorder(stream);
+      const recordingStream = new MediaStream(stream.getTracks());
+      if (!recordingStream.getAudioTracks().length && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          audioStream.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
+        } catch {
+          setMediaError('Microphone access was denied. Recording will continue with video only.');
+        }
+      }
+
+      const mediaRecorder = new MediaRecorder(recordingStream);
       const audioChunks: BlobPart[] = [];
       mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data);
       mediaRecorder.onstop = () => {
@@ -147,7 +162,7 @@ const AIInterviewPage = () => {
       setRecording(true);
       setMediaError('');
     } catch {
-      setMediaError('Unable to start audio recording.');
+      setMediaError('Unable to start recording.');
     }
   };
 
@@ -234,7 +249,26 @@ const AIInterviewPage = () => {
                       <li>Use the video preview to maintain strong delivery.</li>
                     </ul>
                   </div>
-                  <Button onClick={handleBeginAnswer} disabled={!cameraActive || loadingQuestions}>Start answering</Button>
+                  <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+                    <Button onClick={cameraActive ? handleStopCamera : handleStartCamera}>
+                      {cameraActive ? 'Stop camera' : 'Turn on camera'}
+                    </Button>
+                    <Button onClick={handleBeginAnswer} disabled={!cameraActive || loadingQuestions}>
+                      Start answering
+                    </Button>
+                  </div>
+                  {cameraActive && (
+                    <div className="rounded-3xl border border-white/10 bg-surface/80 p-4">
+                      <p className="text-sm uppercase tracking-[0.24em] text-slate-300">Camera preview</p>
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        muted
+                        playsInline
+                        className="mt-4 h-48 w-full rounded-3xl border border-white/10 bg-slate-950 object-cover"
+                      />
+                    </div>
+                  )}
                   {!cameraActive && <p className="text-sm text-slate-300">Webcam is required to begin the answer stage.</p>}
                 </div>
               </div>
