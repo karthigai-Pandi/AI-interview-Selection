@@ -57,7 +57,7 @@ const ResumeUploadPage = () => {
   };
 
   if (workflow.currentStep !== 'resume') {
-    return <Navigate replace to={`/candidate/${workflow.currentStep}`} />;
+    return <Navigate replace to={`/candidate/flow/${workflow.currentStep}`} />;
   }
 
   return (

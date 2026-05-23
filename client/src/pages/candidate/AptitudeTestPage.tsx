@@ -112,7 +112,7 @@ const AptitudeTestPage = () => {
   }, [timeLeft, submitted]);
 
   if (workflow.currentStep !== 'aptitude') {
-    return <Navigate replace to={`/candidate/${workflow.currentStep}`} />;
+    return <Navigate replace to={`/candidate/flow/${workflow.currentStep}`} />;
   }
 
   const currentQuestion = questions[currentIndex];

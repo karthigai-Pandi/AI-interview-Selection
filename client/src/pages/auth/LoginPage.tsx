@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
@@ -11,11 +11,20 @@ import { RootState } from '../../store';
 const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { token, user } = useSelector((state: RootState) => state.auth);
   const workflow = useSelector((state: RootState) => state.workflow);
   const [email, setEmail] = useState(import.meta.env.DEV ? 'candidate@example.com' : '');
   const [password, setPassword] = useState(import.meta.env.DEV ? 'password123' : '');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    if (location.state && (location.state as any).message) {
+      setSuccessMessage((location.state as any).message);
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -49,7 +58,7 @@ const LoginPage = () => {
     if (user.role === 'admin') {
       return <Navigate replace to="/admin" />;
     }
-    return <Navigate replace to={`/candidate/${workflow.currentStep}`} />;
+    return <Navigate replace to="/candidate" />;
   }
 
   return (
@@ -87,6 +96,7 @@ const LoginPage = () => {
             </label>
             <Link to="/" className="text-indigo-300 hover:text-indigo-200">Forgot password?</Link>
           </div>
+          {successMessage && <p className="text-sm text-emerald-400">{successMessage}</p>}
           {error && <p className="text-sm text-red-400">{error}</p>}
           <Button type="submit">Sign in</Button>
         </form>

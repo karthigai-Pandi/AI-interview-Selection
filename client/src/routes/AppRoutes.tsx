@@ -11,6 +11,7 @@ import TechnicalTestPage from '../pages/candidate/TechnicalTestPage';
 import CodingAssessmentPage from '../pages/candidate/CodingAssessmentPage';
 import AIInterviewPage from '../pages/candidate/AIInterviewPage';
 import PerformanceAnalysisPage from '../pages/candidate/PerformanceAnalysisPage';
+import CandidateDashboard from '../pages/CandidateDashboard';
 
 const AppRoutes = () => {
   return (
@@ -19,7 +20,15 @@ const AppRoutes = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route
-        path="/candidate/*"
+        path="/candidate"
+        element={
+          <ProtectedRoute role="candidate">
+            <CandidateDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/candidate/flow/*"
         element={
           <ProtectedRoute role="candidate">
             <CandidateWorkflow />

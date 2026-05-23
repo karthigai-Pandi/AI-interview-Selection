@@ -16,6 +16,7 @@ const RegisterPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   if (token && user) {
     return <Navigate replace to={user.role === 'admin' ? '/admin' : '/candidate'} />;
@@ -24,13 +25,17 @@ const RegisterPage = () => {
   const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
+    setSuccess('');
     dispatch(loginStart());
 
     try {
-      const response = await registerRequest({ name, email, password });
-      const { user, token } = response.data;
-      dispatch(loginSuccess({ user, token }));
-      navigate(user.role === 'admin' ? '/admin' : '/candidate/resume');
+      await registerRequest({ name, email, password });
+      setSuccess('Account created successfully! Redirecting to sign in page...');
+      setTimeout(() => {
+        navigate('/login', {
+          state: { message: 'Account created successfully! Please sign in with your credentials.' },
+        });
+      }, 2000);
     } catch (err: any) {
       if (err?.message === 'Network Error') {
         setError(
@@ -83,7 +88,10 @@ const RegisterPage = () => {
             />
           </div>
           {error && <p className="text-sm text-red-400">{error}</p>}
-          <Button type="submit">Create account</Button>
+          {success && <p className="text-sm text-emerald-400">{success}</p>}
+          <Button type="submit" disabled={!!success}>
+            {success ? 'Redirecting...' : 'Create account'}
+          </Button>
         </form>
         <p className="mt-6 text-center text-sm text-slate-400">
           Already registered?{' '}

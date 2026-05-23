@@ -89,7 +89,7 @@ const TechnicalTestPage = () => {
   }, [workflow.aptitude.completed, workflow.technical.total]);
 
   if (workflow.currentStep !== 'technical') {
-    return <Navigate replace to={`/candidate/${workflow.currentStep}`} />;
+    return <Navigate replace to={`/candidate/flow/${workflow.currentStep}`} />;
   }
 
   const currentQuestion = questions[currentIndex];

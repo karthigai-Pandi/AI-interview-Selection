@@ -23,6 +23,7 @@ const CandidateDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const workflow = useSelector((state: RootState) => state.workflow);
+  const { user } = useSelector((state: RootState) => state.auth);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [hasResume, setHasResume] = useState(false);
@@ -72,14 +73,14 @@ const CandidateDashboard = () => {
 
   const handleStartInterview = () => {
     if (workflow.currentStep !== 'interview') {
-      navigate(`/candidate/${workflow.currentStep}`);
+      navigate(`/candidate/flow/${workflow.currentStep}`);
       return;
     }
 
     setIsInterviewing(true);
     // Add small delay for button animation then navigate to actual interview page
     setTimeout(() => {
-      navigate('/candidate/interview');
+      navigate('/candidate/flow/interview');
     }, 500);
   };
 
@@ -88,7 +89,10 @@ const CandidateDashboard = () => {
   };
 
   return (
-    <DashboardShell title="Candidate dashboard" subtitle="Your personalized interview readiness hub">
+    <DashboardShell 
+      title={`Hello ${user?.name || 'Candidate'}, welcome to our community!`} 
+      subtitle="Your personalized interview readiness hub"
+    >
       <div className="space-y-8 pb-10">
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <Card title="Candidate progress" description="Your interview readiness and AI feedback at a glance.">
