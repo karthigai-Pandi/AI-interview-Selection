@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
+import { ChangeEvent, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { motion } from 'framer-motion';
-import { DocumentPlusIcon, VideoCameraIcon, ChartBarIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { DocumentPlusIcon, VideoCameraIcon, ChartBarIcon, ArrowPathIcon, SparklesIcon, RocketLaunchIcon } from '@heroicons/react/24/outline';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import DashboardShell from '../components/layout/DashboardShell';
@@ -37,7 +37,7 @@ const CandidateDashboard = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -129,15 +129,15 @@ const CandidateDashboard = () => {
             <div className="space-y-3">
               <Button 
                 variant="primary" 
-                className="w-full justify-start shadow-indigo-500/10" 
-                icon={isInterviewing ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : <VideoCameraIcon className="h-4 w-4" />}
+                className="w-full justify-start shadow-indigo-500/10 text-base" 
+                icon={isInterviewing ? <ArrowPathIcon className="h-5 w-5 animate-spin" /> : <RocketLaunchIcon className="h-5 w-5" />}
                 onClick={handleStartInterview}
                 disabled={isInterviewing}
               >
                 {workflow.currentStep === 'interview'
                   ? hasInterviews
                     ? 'Continue practice'
-                    : 'Start real mock interview'
+                    : 'Start mock interview'
                   : 'Continue workflow'}
               </Button>
               
@@ -150,15 +150,17 @@ const CandidateDashboard = () => {
               />
               <Button 
                 variant="secondary" 
-                className="w-full justify-start" 
-                icon={isUploading ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : <DocumentPlusIcon className="h-4 w-4" />}
+                className="w-full justify-start text-base" 
+                icon={isUploading ? <ArrowPathIcon className="h-5 w-5 animate-spin" /> : <DocumentPlusIcon className="h-5 w-5" />}
                 onClick={handleUploadClick}
                 disabled={isUploading}
               >
                 {hasResume ? 'Update resume' : 'Upload resume'}
               </Button>
               
-              <Button variant="ghost" className="w-full justify-start">Explore employer matches</Button>
+              <Button variant="ghost" className="w-full justify-start text-base">
+                Explore employer matches
+              </Button>
               {import.meta.env.DEV && (
                 <Button variant="ghost" className="w-full justify-start text-rose-300 hover:text-white" onClick={handleResetWorkflow}>
                   Reset workflow (dev)
