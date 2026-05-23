@@ -22,7 +22,9 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 const clientUrl = process.env.CLIENT_URL;
-const allowedOrigins = [clientUrl].filter(Boolean) as string[];
+const defaultAllowedOrigins = [clientUrl, 'https://ai-interview-selection-client.vercel.app']
+  .filter(Boolean) as string[];
+const allowedOrigins = Array.from(new Set(defaultAllowedOrigins));
 
 const isAllowedOrigin = (origin: string | undefined) => {
   if (!origin) return true;
