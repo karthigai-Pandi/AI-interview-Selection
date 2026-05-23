@@ -8,7 +8,7 @@ const PerformanceAnalysisPage = () => {
   const workflow = useSelector((state: RootState) => state.workflow);
 
   if (!workflow.interview.completed) {
-    return <Navigate replace to="/candidate/interview" />;
+    return <Navigate replace to="/candidate/flow/interview" />;
   }
 
   const data = [

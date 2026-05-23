@@ -52,7 +52,7 @@ const CodingAssessmentPage = () => {
   }, [dispatch, workflow.coding.selectedLanguage, workflow.coding.code]);
 
   if (workflow.currentStep !== 'coding') {
-    return <Navigate replace to={`/candidate/${workflow.currentStep}`} />;
+    return <Navigate replace to={`/candidate/flow/${workflow.currentStep}`} />;
   }
 
   const handleRun = () => {

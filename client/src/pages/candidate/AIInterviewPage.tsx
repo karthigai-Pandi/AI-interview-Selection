@@ -82,12 +82,21 @@ const AIInterviewPage = () => {
     }
   }, [stream]);
 
+  useEffect(() => {
+    return () => {
+      // Stop webcam and release media devices when unmounting (leaving the page)
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [stream]);
+
   if (workflow.currentStep !== 'interview') {
-    return <Navigate replace to={`/candidate/${workflow.currentStep}`} />;
+    return <Navigate replace to={`/candidate/flow/${workflow.currentStep}`} />;
   }
 
   if (workflow.interview.completed) {
-    return <Navigate replace to="/candidate/performance" />;
+    return <Navigate replace to="/candidate/flow/performance" />;
   }
 
   const total = workflow.interview.questions.length || 1;
@@ -197,6 +206,7 @@ const AIInterviewPage = () => {
       setTranscript('');
     } else {
       const confidencePoints = Math.min(95, 60 + answeredCount * 8);
+      handleStopCamera(); // Stop the camera immediately when finishing the interview
       dispatch(completeInterview({ confidenceScore: confidencePoints }));
     }
   };
