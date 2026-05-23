@@ -2,10 +2,10 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const navItems = [
-  { label: 'Platform', href: '#features' },
-  { label: 'Dashboard', href: '/candidate' },
-  { label: 'Analytics', href: '/admin' },
-  { label: 'Login', href: '/login' },
+  { label: 'Platform', href: '#features', internal: false },
+  { label: 'Dashboard', href: '/candidate', internal: true },
+  { label: 'Analytics', href: '/admin', internal: true },
+  { label: 'Login', href: '/login', internal: true },
 ];
 
 const Navbar = () => {
@@ -21,9 +21,15 @@ const Navbar = () => {
       </Link>
       <nav className="hidden items-center gap-8 lg:flex">
         {navItems.map((item) => (
-          <a key={item.label} href={item.href} className="text-sm text-slate-300 transition hover:text-slate-100">
-            {item.label}
-          </a>
+          item.internal ? (
+            <Link key={item.label} to={item.href} className="text-sm text-slate-300 transition hover:text-slate-100">
+              {item.label}
+            </Link>
+          ) : (
+            <a key={item.label} href={item.href} className="text-sm text-slate-300 transition hover:text-slate-100">
+              {item.label}
+            </a>
+          )
         ))}
       </nav>
       <div className="flex items-center gap-3">
