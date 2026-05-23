@@ -12,6 +12,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.10",
     "@heroicons/react": "^2.0.18",
+    "@monaco-editor/react": "^4.7.0",
     "@reduxjs/toolkit": "^1.9.5",
     "axios": "^1.6.0",
     "framer-motion": "^11.0.0",
@@ -31,6 +32,7 @@
     "@types/react-dom": "^18.3.7",
     "@typescript-eslint/eslint-plugin": "^7.15.3",
     "@typescript-eslint/parser": "^7.15.3",
+    "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
     "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.29.4",
@@ -41,7 +43,6 @@
     "postcss": "^8.4.37",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.5.4",
-    "vite": "^5.4.1",
-    "@vitejs/plugin-react": "^4.3.1"
+    "vite": "^5.4.1"
   }
 }
