@@ -27,7 +27,14 @@ const LoginPage = () => {
       const { user, token } = response.data;
       dispatch(loginSuccess({ user, token }));
     } catch (err: any) {
-      setError(err?.response?.data?.message || err?.message || 'Login failed. Please try again.');
+      if (err?.message === 'Network Error') {
+        setError(
+          'Network Error: Unable to connect to the backend server. ' +
+          'If this is a deployed application, make sure the VITE_API_URL environment variable is configured in Vercel settings and your backend server is online.'
+        );
+      } else {
+        setError(err?.response?.data?.message || err?.message || 'Login failed. Please try again.');
+      }
     }
   };
 

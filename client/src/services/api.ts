@@ -5,6 +5,13 @@ const baseURL = rawApiUrl.replace(/\/+$/, '').endsWith('/api')
   ? rawApiUrl.replace(/\/+$/, '')
   : `${rawApiUrl.replace(/\/+$/, '')}/api`;
 
+if (typeof window !== 'undefined' && window.location && !window.location.hostname.includes('localhost') && rawApiUrl.includes('localhost')) {
+  console.warn(
+    '[AI Interview Selection] WARNING: The application is running in production, but VITE_API_URL points to localhost ("' + rawApiUrl + '"). ' +
+    'This will cause login Network Errors. Please configure VITE_API_URL in your hosting provider (e.g. Vercel) environment variables and redeploy.'
+  );
+}
+
 export const api = axios.create({
   baseURL,
   headers: {
