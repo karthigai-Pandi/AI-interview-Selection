@@ -28,7 +28,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Global response handler: on 401, clear token and signal UI
 api.interceptors.response.use(
   (resp) => resp,
   (error) => {
