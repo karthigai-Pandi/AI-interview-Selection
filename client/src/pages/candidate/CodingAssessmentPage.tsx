@@ -66,14 +66,13 @@ const CodingAssessmentPage = () => {
     return <Navigate replace to={`/candidate/flow/${workflow.currentStep}`} />;
   }
 
-  // Handle language change and update template
+  
   const handleLanguageChange = (lang: 'JavaScript' | 'Java' | 'Python' | 'C++') => {
     dispatch(setCodingLanguage(lang));
     dispatch(updateCodingCode(defaultTemplate[lang]));
   };
 
-  // Run code against test cases (with JS compiling/running in browser, and compilations simulated for compiled languages)
-  const handleRun = () => {
+   const handleRun = () => {
     if (!problem) return;
     setIsRunning(true);
     setOutput('Compiling solution and initializing environment...');
