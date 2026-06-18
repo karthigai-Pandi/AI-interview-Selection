@@ -32,6 +32,19 @@ api.interceptors.response.use(
   (resp) => resp,
   (error) => {
     const status = error?.response?.status;
+    
+    // Suppress errors from browser extensions (CORS, etc.)
+    const errorMessage = error?.message || '';
+    if (
+      errorMessage.includes('NetworkError') ||
+      errorMessage.includes('Extension context invalidated') ||
+      errorMessage.includes('extension') ||
+      error?.code === 'ERR_NETWORK'
+    ) {
+      // Log as debug only, don't propagate
+      console.debug('[API] Browser extension network issue (suppressed)');
+    }
+    
     if (status === 401) {
       try {
         localStorage.removeItem('token');

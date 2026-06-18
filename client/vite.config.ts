@@ -6,6 +6,22 @@ export default defineConfig({
   server: {
     port: 4173,
     open: true,
+    // Ensure CSS files are served correctly
+    middlewareMode: false,
+    fs: {
+      strict: true,
+    },
+  },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    emptyOutDir: true,
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
   resolve: {
     alias: {
