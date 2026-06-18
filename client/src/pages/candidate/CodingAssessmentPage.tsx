@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Editor from '@monaco-editor/react';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import { completeCoding, setCodingLanguage, setCodingResult, updateCodingCode } from '../../store/slices/workflowSlice';
+import { completeCoding, setCodingLanguage, setCodingResult, updateCodingCode, resetCoding } from '../../store/slices/workflowSlice';
 import { RootState } from '../../store';
 import { getCodingProblem } from '../../services/workflowService';
 
@@ -173,6 +173,19 @@ const CodingAssessmentPage = () => {
     }, 1200);
   };
 
+  const handleReset = () => {
+    if (window.confirm('Are you sure you want to reset the coding assessment? All your code will be cleared.')) {
+      dispatch(resetCoding());
+      setOutput('');
+      setFeedback('');
+      setCompleted(false);
+      setTimeLeft(900);
+      setIsRunning(false);
+      setIsSubmitting(false);
+      loadProblem();
+    }
+  };
+
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
   const progressPercent = Math.round((timeLeft / 900) * 100);
@@ -269,7 +282,7 @@ const CodingAssessmentPage = () => {
           <div className="flex flex-wrap items-center gap-3">
             <Button 
               onClick={handleRun} 
-              disabled={!problem || loading || isRunning}
+              disabled={!problem || loading || isRunning || completed}
               className="px-6"
             >
               {isRunning ? 'Running...' : 'Run tests'}
@@ -280,7 +293,7 @@ const CodingAssessmentPage = () => {
               disabled={completed || !problem || loading || isSubmitting}
               className="px-6"
             >
-              {isSubmitting ? 'Evaluating...' : 'Submit solution'}
+              {isSubmitting ? 'Evaluating...' : completed ? 'Assessment Completed' : 'Submit solution'}
             </Button>
             <Button 
               variant="ghost" 
@@ -289,6 +302,15 @@ const CodingAssessmentPage = () => {
             >
               Reset code
             </Button>
+            {completed && (
+              <Button 
+                variant="ghost" 
+                onClick={handleReset}
+                className="text-amber-400 hover:text-amber-300"
+              >
+                Retake Assessment
+              </Button>
+            )}
             {fetchError && (
               <Button variant="ghost" onClick={loadProblem}>Retry challenge</Button>
             )}
@@ -359,10 +381,22 @@ const CodingAssessmentPage = () => {
               <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${
                 completed ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20' : 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/20'
               }`}>
-                {completed ? 'Submitted' : 'In progress'}
+                {completed ? '✓ Submitted' : 'In progress'}
               </span>
             </div>
           </div>
+
+          {completed && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-5 text-sm text-slate-100"
+            >
+              <p className="text-xs uppercase tracking-[0.24em] text-emerald-300 font-semibold">Assessment submitted successfully!</p>
+              <p className="mt-2 text-slate-300">Your solution has been graded. Unlock the final AI Interview round.</p>
+              <Button variant="secondary" onClick={handleReset} className="mt-4 w-full">Retake Assessment</Button>
+            </motion.div>
+          )}
         </div>
       </Card>
     </div>

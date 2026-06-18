@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
-import { completeAptitude, startAptitude } from '../../store/slices/workflowSlice';
+import { completeAptitude, startAptitude, resetAptitude } from '../../store/slices/workflowSlice';
 import { RootState } from '../../store';
 
 interface Question {
@@ -136,6 +136,17 @@ const AptitudeTestPage = () => {
     dispatch(completeAptitude({ score: calculatedScore, answered: answeredCount, answers }));
   };
 
+  const handleReset = () => {
+    if (window.confirm('Are you sure you want to reset the aptitude test? All your answers will be cleared.')) {
+      dispatch(resetAptitude());
+      setAnswers({});
+      setCurrentIndex(0);
+      setTimeLeft(600);
+      setSubmitted(false);
+      setScore(null);
+    }
+  };
+
   const progress = Math.round(((currentIndex + 1) / questions.length) * 100);
 
   return (
@@ -175,19 +186,25 @@ const AptitudeTestPage = () => {
               <span>Attempted: {attempted}</span>
               <span>Unattempted: {unattempted}</span>
               <span>Progress: {progress}%</span>
+              {submitted && <span className="text-emerald-400">✓ Completed</span>}
             </div>
             <div className="flex gap-3">
-              <Button onClick={() => setCurrentIndex((idx) => Math.max(idx - 1, 0))} disabled={currentIndex === 0}>Previous</Button>
-              <Button onClick={() => setCurrentIndex((idx) => Math.min(idx + 1, questions.length - 1))} disabled={currentIndex === questions.length - 1}>Next</Button>
-              <Button variant="secondary" onClick={handleSubmit} disabled={submitted || answeredCount === 0}>Submit test</Button>
+              <Button onClick={() => setCurrentIndex((idx) => Math.max(idx - 1, 0))} disabled={currentIndex === 0 || submitted}>Previous</Button>
+              <Button onClick={() => setCurrentIndex((idx) => Math.min(idx + 1, questions.length - 1))} disabled={currentIndex === questions.length - 1 || submitted}>Next</Button>
+              <Button variant="secondary" onClick={handleSubmit} disabled={submitted || answeredCount === 0}>{submitted ? 'Test Completed' : 'Submit test'}</Button>
             </div>
           </div>
 
           {submitted && (
             <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6 text-emerald-200">
-              <p className="text-sm uppercase tracking-[0.24em] text-emerald-300">Test completed</p>
-              <h3 className="mt-3 text-3xl font-semibold">{score}%</h3>
-              <p className="mt-2 text-slate-300">Excellent work — the technical round is now unlocked.</p>
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.24em] text-emerald-300">Test completed</p>
+                  <h3 className="mt-3 text-3xl font-semibold">Score: {score}%</h3>
+                  <p className="mt-2 text-slate-300">Excellent work — the technical round is now unlocked.</p>
+                </div>
+                <Button variant="secondary" onClick={handleReset} className="whitespace-nowrap">Retake Test</Button>
+              </div>
             </div>
           )}
         </div>

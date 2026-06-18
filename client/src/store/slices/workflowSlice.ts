@@ -186,6 +186,39 @@ const workflowSlice = createSlice({
       }
       persistWorkflowState(state);
     },
+    resetAptitude(state) {
+      state.aptitude = {
+        started: false,
+        completed: false,
+        score: null,
+        total: 10,
+        answered: 0,
+        answers: {},
+      };
+      persistWorkflowState(state);
+    },
+    resetTechnical(state) {
+      state.technical = {
+        started: false,
+        completed: false,
+        score: null,
+        total: 8,
+        answered: 0,
+        answers: {},
+        difficulty: 'medium',
+      };
+      persistWorkflowState(state);
+    },
+    resetCoding(state) {
+      state.coding = {
+        selectedLanguage: 'JavaScript',
+        code: '',
+        runResult: '',
+        score: null,
+        completed: false,
+      };
+      persistWorkflowState(state);
+    },
     resetWorkflow(state) {
       state.currentStep = 'resume';
       state.resume = {
@@ -248,6 +281,9 @@ export const {
   advanceInterviewQuestion,
   goBackInterviewQuestion,
   completeInterview,
+  resetAptitude,
+  resetTechnical,
+  resetCoding,
   resetWorkflow,
 } = workflowSlice.actions;
 

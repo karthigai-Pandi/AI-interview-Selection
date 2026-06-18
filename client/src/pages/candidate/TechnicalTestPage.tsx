@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import { completeTechnical, setTechnicalDifficulty } from '../../store/slices/workflowSlice';
+import { completeTechnical, setTechnicalDifficulty, resetTechnical } from '../../store/slices/workflowSlice';
 import { RootState } from '../../store';
 
 interface Question {
@@ -194,6 +194,17 @@ const TechnicalTestPage = () => {
     dispatch(completeTechnical({ score: normalized, answered: Object.keys(answers).length, answers }));
   };
 
+  const handleReset = () => {
+    if (window.confirm('Are you sure you want to reset the technical test? All your answers will be cleared.')) {
+      dispatch(resetTechnical());
+      setAnswers({});
+      setCurrentIndex(0);
+      setTimeLeft(480);
+      setSubmitted(false);
+      setScore(null);
+    }
+  };
+
   const difficultyOptions: Array<'easy' | 'medium' | 'hard'> = ['easy', 'medium', 'hard'];
   const answeredCount = Object.keys(answers).length;
   const progressPercent = Math.round((answeredCount / (questions.length || 1)) * 100);
@@ -275,10 +286,10 @@ const TechnicalTestPage = () => {
           {/* Nav Actions */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/5 pt-4">
             <div className="flex gap-3">
-              <Button onClick={() => setCurrentIndex((idx) => Math.max(idx - 1, 0))} disabled={currentIndex === 0}>Previous</Button>
-              <Button onClick={() => setCurrentIndex((idx) => Math.min(idx + 1, questions.length - 1))} disabled={currentIndex === questions.length - 1}>Next</Button>
+              <Button onClick={() => setCurrentIndex((idx) => Math.max(idx - 1, 0))} disabled={currentIndex === 0 || submitted}>Previous</Button>
+              <Button onClick={() => setCurrentIndex((idx) => Math.min(idx + 1, questions.length - 1))} disabled={currentIndex === questions.length - 1 || submitted}>Next</Button>
             </div>
-            <Button variant="secondary" onClick={handleSubmit} disabled={submitted || answeredCount === 0}>Submit answers</Button>
+            <Button variant="secondary" onClick={handleSubmit} disabled={submitted || answeredCount === 0}>{submitted ? 'Test Completed' : 'Submit answers'}</Button>
           </div>
 
           {/* Scoring Banner */}
@@ -288,9 +299,14 @@ const TechnicalTestPage = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6 text-slate-100"
             >
-              <p className="text-xs uppercase tracking-[0.24em] text-emerald-300 font-bold">Round Completed successfully!</p>
-              <h3 className="mt-3 text-4xl font-semibold text-white">{score}%</h3>
-              <p className="mt-2 text-sm text-slate-300">Great job! The Coding Assessment round is now unlocked.</p>
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.24em] text-emerald-300 font-bold">Round Completed successfully!</p>
+                  <h3 className="mt-3 text-4xl font-semibold text-white">Score: {score}%</h3>
+                  <p className="mt-2 text-sm text-slate-300">Great job! The Coding Assessment round is now unlocked.</p>
+                </div>
+                <Button variant="secondary" onClick={handleReset} className="whitespace-nowrap">Retake Test</Button>
+              </div>
             </motion.div>
           )}
         </div>
