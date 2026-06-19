@@ -38,14 +38,30 @@ const RegisterPage = () => {
       }, 2000);
     } catch (err: any) {
       dispatch(loginFailure());
-      if (err?.message === 'Network Error') {
+      
+      // Network/connection errors
+      if ((err as any).isNetworkError || err?.message?.includes('Unable to connect') || err?.code === 'ERR_NETWORK') {
         setError(
           'Network Error: Unable to connect to the backend server. ' +
-          'If this is a deployed application, make sure the VITE_API_URL environment variable is configured in Vercel settings and your backend server is online.'
+          'If this is a deployed application, make sure the VITE_API_URL environment variable is configured in Vercel settings and your backend server is online. ' +
+          `(${err?.message})`
         );
-      } else {
-        setError(err?.response?.data?.message || err?.message || 'Registration failed. Please try again.');
       }
+      // Timeout errors
+      else if (err?.message?.includes('timeout')) {
+        setError(`Server timeout: ${err?.message}. Please check if your backend is running.`);
+      }
+      // API validation/auth errors
+      else if (err?.response?.data?.message) {
+        setError(err.response.data.message);
+      }
+      // Generic fallback
+      else {
+        setError(err?.message || 'Registration failed. Please try again.');
+      }
+      
+      // Always log full error for debugging
+      console.error('[Register Error]', err);
     }
   };
 
