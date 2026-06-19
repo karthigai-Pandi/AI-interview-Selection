@@ -5,14 +5,14 @@ import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { motion } from 'framer-motion';
 import { login as loginRequest } from '../../services/authService';
-import { loginStart, loginSuccess } from '../../store/slices/authSlice';
+import { loginStart, loginSuccess, loginFailure } from '../../store/slices/authSlice';
 import { RootState } from '../../store';
 
 const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { token, user } = useSelector((state: RootState) => state.auth);
+  const { token, user, loading } = useSelector((state: RootState) => state.auth);
   const workflow = useSelector((state: RootState) => state.workflow);
   const [email, setEmail] = useState(import.meta.env.DEV ? 'candidate@example.com' : '');
   const [password, setPassword] = useState(import.meta.env.DEV ? 'password123' : '');
@@ -36,6 +36,7 @@ const LoginPage = () => {
       const { user, token } = response.data;
       dispatch(loginSuccess({ user, token }));
     } catch (err: any) {
+      dispatch(loginFailure());
       if (err?.message === 'Network Error') {
         setError(
           'Network Error: Unable to connect to the backend server. ' +
@@ -98,7 +99,9 @@ const LoginPage = () => {
           </div>
           {successMessage && <p className="text-sm text-emerald-400">{successMessage}</p>}
           {error && <p className="text-sm text-red-400">{error}</p>}
-          <Button type="submit">Sign in</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign in'}
+          </Button>
         </form>
         <p className="mt-6 text-center text-sm text-slate-400">
           New to AIVentures?{' '}

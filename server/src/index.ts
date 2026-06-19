@@ -14,10 +14,9 @@ connectDatabase()
   .catch((err) => {
     console.error('Database connection failed', err);
     console.warn('Continuing startup without a MongoDB connection. Some features may be limited.');
-  })
-  .finally(() => {
-    initSocketServer(server);
-    server.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
   });
+
+initSocketServer(server);
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});

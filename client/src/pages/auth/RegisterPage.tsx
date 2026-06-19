@@ -5,13 +5,13 @@ import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { motion } from 'framer-motion';
 import { register as registerRequest } from '../../services/authService';
-import { loginStart, loginSuccess } from '../../store/slices/authSlice';
+import { loginStart, loginSuccess, loginFailure } from '../../store/slices/authSlice';
 import { RootState } from '../../store';
 
 const RegisterPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { token, user } = useSelector((state: RootState) => state.auth);
+  const { token, user, loading } = useSelector((state: RootState) => state.auth);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,6 +37,7 @@ const RegisterPage = () => {
         });
       }, 2000);
     } catch (err: any) {
+      dispatch(loginFailure());
       if (err?.message === 'Network Error') {
         setError(
           'Network Error: Unable to connect to the backend server. ' +
@@ -89,8 +90,8 @@ const RegisterPage = () => {
           </div>
           {error && <p className="text-sm text-red-400">{error}</p>}
           {success && <p className="text-sm text-emerald-400">{success}</p>}
-          <Button type="submit" disabled={!!success}>
-            {success ? 'Redirecting...' : 'Create account'}
+          <Button type="submit" disabled={!!success || loading}>
+            {success ? 'Redirecting...' : loading ? 'Creating account...' : 'Create account'}
           </Button>
         </form>
         <p className="mt-6 text-center text-sm text-slate-400">
