@@ -30,6 +30,7 @@ const RegisterPage = () => {
 
     try {
       await registerRequest({ name, email, password });
+      dispatch(loginFailure());
       setSuccess('Account created successfully! Redirecting to sign in page...');
       setTimeout(() => {
         navigate('/login', {
