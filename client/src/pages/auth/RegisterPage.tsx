@@ -1,124 +1,168 @@
 import { FormEvent, useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
-import { motion } from 'framer-motion';
+import AuthLayout from '../../components/auth/AuthLayout';
+import AuthField from '../../components/auth/AuthField';
+import AuthAlert from '../../components/auth/AuthAlert';
 import { register as registerRequest } from '../../services/authService';
-import { loginStart, loginSuccess, loginFailure } from '../../store/slices/authSlice';
+import { loginSuccess } from '../../store/slices/authSlice';
 import { RootState } from '../../store';
+import { getAuthErrorMessage, getRoleHomePath } from './authUtils';
+
+const MIN_PASSWORD_LENGTH = 8;
 
 const RegisterPage = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { token, user, loading } = useSelector((state: RootState) => state.auth);
+  const { token, user } = useSelector((state: RootState) => state.auth);
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (token && user) {
-    return <Navigate replace to={user.role === 'admin' ? '/admin' : '/candidate'} />;
-  }
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+
+    if (!trimmedName) {
+      errors.name = 'Full name is required.';
+    }
+
+    if (!trimmedEmail) {
+      errors.email = 'Email is required.';
+    }
+
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      errors.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
+    }
+
+    if (password !== confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match.';
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
-    setSuccess('');
-    dispatch(loginStart());
+    setFieldErrors({});
+
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
 
     try {
-      await registerRequest({ name, email, password });
-      dispatch(loginFailure());
-      setSuccess('Account created successfully! Redirecting to sign in page...');
-      setTimeout(() => {
-        navigate('/login', {
-          state: { message: 'Account created successfully! Please sign in with your credentials.' },
-        });
-      }, 2000);
-    } catch (err: any) {
-      dispatch(loginFailure());
-      
-      // Network/connection errors
-      if ((err as any).isNetworkError || err?.message?.includes('Unable to connect') || err?.code === 'ERR_NETWORK') {
-        setError(
-          'Network Error: Unable to connect to the backend server. ' +
-          'If this is a deployed application, make sure the VITE_API_URL environment variable is configured in Vercel settings and your backend server is online. ' +
-          `(${err?.message})`
-        );
-      }
-      // Timeout errors
-      else if (err?.message?.includes('timeout')) {
-        setError(`Server timeout: ${err?.message}. Please check if your backend is running.`);
-      }
-      // API validation/auth errors
-      else if (err?.response?.data?.message) {
-        setError(err.response.data.message);
-      }
-      // Generic fallback
-      else {
-        setError(err?.message || 'Registration failed. Please try again.');
-      }
-      
-      // Always log full error for debugging
+      const response = await registerRequest({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+      });
+      const { user: authUser, token: authToken } = response.data;
+      dispatch(loginSuccess({ user: authUser, token: authToken }));
+    } catch (err) {
+      setError(getAuthErrorMessage(err));
       console.error('[Register Error]', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  if (token && user) {
+    return <Navigate replace to={getRoleHomePath(user.role)} />;
+  }
+
   return (
-    <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }} className="mx-auto max-w-xl">
-      <Card title="Create your account" description="Join the AI hiring platform for candidates and recruiting teams.">
-        <form onSubmit={handleRegister} className="space-y-5">
-          <div className="space-y-3">
-            <label className="text-sm text-slate-300">Full name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Alex Morgan"
-              className="w-full rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-indigo-400"
-              required
-            />
-          </div>
-          <div className="space-y-3">
-            <label className="text-sm text-slate-300">Company email</label>
-            <input
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="hello@company.com"
-              className="w-full rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-indigo-400"
-              required
-            />
-          </div>
-          <div className="space-y-3">
-            <label className="text-sm text-slate-300">Password</label>
-            <input
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Create a password"
-              className="w-full rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-indigo-400"
-              required
-            />
-          </div>
-          {error && <p className="text-sm text-red-400">{error}</p>}
-          {success && <p className="text-sm text-emerald-400">{success}</p>}
-          <Button type="submit" disabled={!!success || loading}>
-            {success ? 'Redirecting...' : loading ? 'Creating account...' : 'Create account'}
-          </Button>
-        </form>
-        <p className="mt-6 text-center text-sm text-slate-400">
-          Already registered?{' '}
-          <Link to="/login" className="text-indigo-300 hover:text-indigo-200">
+    <AuthLayout
+      title="Create your account"
+      subtitle="Join as a candidate to upload your resume, take assessments, and complete AI interviews."
+      footer={
+        <>
+          Already have an account?{' '}
+          <Link to="/login" className="font-medium text-primary-100 transition hover:text-white">
             Sign in
           </Link>
-        </p>
-      </Card>
-    </motion.div>
+        </>
+      }
+    >
+      <form onSubmit={handleRegister} className="space-y-5" noValidate>
+        <AuthField
+          label="Full name"
+          name="name"
+          type="text"
+          autoComplete="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Alex Morgan"
+          error={fieldErrors.name}
+          required
+          disabled={isSubmitting}
+        />
+
+        <AuthField
+          label="Email address"
+          name="email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@company.com"
+          error={fieldErrors.email}
+          required
+          disabled={isSubmitting}
+        />
+
+        <AuthField
+          label="Password"
+          name="password"
+          type={showPassword ? 'text' : 'password'}
+          autoComplete="new-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
+          error={fieldErrors.password}
+          required
+          disabled={isSubmitting}
+          trailing={
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="rounded-lg p-1.5 text-slate-400 transition hover:bg-white/5 hover:text-slate-200"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+            </button>
+          }
+        />
+
+        <AuthField
+          label="Confirm password"
+          name="confirmPassword"
+          type={showPassword ? 'text' : 'password'}
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Re-enter your password"
+          error={fieldErrors.confirmPassword}
+          required
+          disabled={isSubmitting}
+        />
+
+        {error && <AuthAlert type="error" message={error} />}
+
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? 'Creating account...' : 'Create account'}
+        </Button>
+      </form>
+    </AuthLayout>
   );
 };
 
